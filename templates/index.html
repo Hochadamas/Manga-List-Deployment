@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block page_title %}ホーム — 漫画マイリスト{% endblock %}
+{% block content %}
+
+<form class="search" method="get" action="{{ url_for('index') }}">
+  <input type="text" name="q" placeholder="タイトルや作者で検索..." value="{{ search }}">
+  <button type="submit">検索</button>
+</form>
+
+{% if mangas %}
+<div class="manga-grid">
+  {% for manga in mangas %}
+  <div class="manga-card">
+    <div class="manga-image">
+      {% if manga.image %}
+        <img src="{{ url_for('static', filename='uploads/' ~ manga.image) }}" alt="{{ manga.title }}の表紙">
+      {% else %}
+        <div class="no-image">表紙なし</div>
+      {% endif %}
+      <span class="status-badge status-{{ manga.status_class }}">{{ manga.status }}</span>
+    </div>
+    <div class="manga-info">
+      <h2>{{ manga.title }}</h2>
+      <p class="author">{{ manga.author }}</p>
+      {% if manga.genre %}<p class="genre">{{ manga.genre }}</p>{% endif %}
+      <p class="progress">既読 {{ manga.volumes_read }}冊 ／ 所有 {{ manga.volumes_owned }}冊</p>
+      {% if manga.rating is not none %}<p class="rating">⭐ {{ manga.rating }}/10</p>{% endif %}
+      {% if manga.comment %}<p class="comment">{{ manga.comment }}</p>{% endif %}
+      <div class="actions">
+        <a href="{{ url_for('edit', manga_id=manga.id) }}" class="button button-edit">編集</a>
+        <form method="post" action="{{ url_for('delete', manga_id=manga.id) }}">
+          <button type="submit" class="button button-delete">削除</button>
+        </form>
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% else %}
+<p class="empty">まだ漫画が登録されていません。<a href="{{ url_for('add') }}">最初の1冊を追加しよう！</a></p>
+{% endif %}
+
+{% endblock %}

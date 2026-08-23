@@ -1,0 +1,12 @@
+venv/
+env/
+__pycache__/
+*.pyc
+mangas.db
+mangas.db-journal
+*.db-journal
+static/uploads/*
+!static/uploads/.gitkeep
+.vscode/
+.DS_Store
+Thumbs.db
