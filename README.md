@@ -28,7 +28,7 @@ A clean web app to track and manage your personal manga collection.
 
 ```bash
 # Clone repository
-git clone <repo-url>
+git clone <https://github.com/Hochadamas/Manga-List.git>
 cd Manga-list
 
 # Create & activate virtual environment
