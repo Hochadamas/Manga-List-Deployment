@@ -10,3 +10,10 @@ static/uploads/*
 .vscode/
 .DS_Store
 Thumbs.db
+terraform/.terraform/
+terraform/*.tfstate
+terraform/*.tfstate.backup
+terraform/.terraform.lock.hcl
+*.pem
+*.tfvars
+ansible/inventory.ini

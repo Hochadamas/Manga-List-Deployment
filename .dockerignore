@@ -1,0 +1,8 @@
+.git
+__pycache__
+*.pyc
+venv/
+.venv/
+mangas.db
+static/uploads/*
+!static/uploads/.gitkeep

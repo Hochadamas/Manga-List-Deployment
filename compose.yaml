@@ -1,0 +1,18 @@
+services:
+  manga-list:
+    build: .
+    image: manga-list:latest
+    container_name: manga-list
+    restart: unless-stopped
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./mangas.db:/app/mangas.db
+      - ./static/uploads:/app/static/uploads
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:5000/')"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
