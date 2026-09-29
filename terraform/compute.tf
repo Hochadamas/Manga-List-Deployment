@@ -41,5 +41,5 @@ resource "aws_instance" "manga_list" {
   subnet_id              = aws_subnet.public.id
   vpc_security_group_ids = [aws_security_group.manga_list_sg.id]
   key_name               = aws_key_pair.terraform_key.key_name
-  tags = { Name = "manga-list-server" }
+  tags                   = { Name = "manga-list-server" }
 }

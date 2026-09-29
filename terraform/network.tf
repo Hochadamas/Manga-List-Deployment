@@ -2,18 +2,18 @@ resource "aws_vpc" "main" {
   cidr_block           = var.vpc_cidr
   enable_dns_support   = true
   enable_dns_hostnames = true
-  tags = { Name = "manga-list-vpc" }
+  tags                 = { Name = "manga-list-vpc" }
 }
 resource "aws_subnet" "public" {
   vpc_id                  = aws_vpc.main.id
   cidr_block              = var.subnet_cidr
   availability_zone       = "ap-northeast-1a"
   map_public_ip_on_launch = true
-  tags = { Name = "manga-list-public-subnet" }
+  tags                    = { Name = "manga-list-public-subnet" }
 }
 resource "aws_internet_gateway" "igw" {
   vpc_id = aws_vpc.main.id
-  tags = { Name = "manga-list-igw" }
+  tags   = { Name = "manga-list-igw" }
 }
 resource "aws_route_table" "public" {
   vpc_id = aws_vpc.main.id
