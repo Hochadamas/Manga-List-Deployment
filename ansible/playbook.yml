@@ -1,0 +1,92 @@
+---
+- name: Deploy Manga List app
+  hosts: manga_server
+  become: true
+  vars:
+    repo_url: "https://github.com/Hochadamas/Manga-List-Deployment.git"
+    app_dir: "/home/ec2-user/Manga-List-Deployment"
+
+  tasks:
+    - name: Update package cache
+      dnf:
+        update_cache: true
+
+    - name: Install Docker and git
+      dnf:
+        name:
+          - docker
+          - git
+        state: present
+
+    - name: Enable and start Docker service
+      systemd:
+        name: docker
+        enabled: true
+        state: started
+
+    - name: Add ec2-user to docker group
+      user:
+        name: ec2-user
+        groups: docker
+        append: true
+
+    - name: Create docker CLI plugins directory
+      file:
+        path: /home/ec2-user/.docker/cli-plugins
+        state: directory
+        owner: ec2-user
+        group: ec2-user
+        mode: "0755"
+
+    - name: Install docker-compose plugin
+      get_url:
+        url: "https://github.com/docker/compose/releases/latest/download/docker-compose-linux-x86_64"
+        dest: /home/ec2-user/.docker/cli-plugins/docker-compose
+        mode: "0755"
+        owner: ec2-user
+        group: ec2-user
+
+    - name: Get latest buildx release info
+      uri:
+        url: https://api.github.com/repos/docker/buildx/releases/latest
+        return_content: true
+      register: buildx_release
+
+    - name: Install docker-buildx plugin
+      get_url:
+        url: "https://github.com/docker/buildx/releases/download/{{ buildx_release.json.tag_name }}/buildx-{{ buildx_release.json.tag_name }}.linux-amd64"
+        dest: /home/ec2-user/.docker/cli-plugins/docker-buildx
+        mode: "0755"
+        owner: ec2-user
+        group: ec2-user
+
+    - name: Clone or update the app repository
+      become_user: ec2-user
+      git:
+        repo: "{{ repo_url }}"
+        dest: "{{ app_dir }}"
+        version: main
+        force: true
+
+    - name: Ensure mangas.db exists with correct permissions
+      file:
+        path: "{{ app_dir }}/mangas.db"
+        state: touch
+        owner: ec2-user
+        group: ec2-user
+        mode: "0666"
+
+    - name: Ensure uploads folder has correct ownership
+      file:
+        path: "{{ app_dir }}/static/uploads"
+        state: directory
+        recurse: true
+        owner: ec2-user
+        group: ec2-user
+        mode: "0777"
+
+    - name: Deploy app with Docker Compose
+      become_user: ec2-user
+      command: docker compose up -d --build
+      args:
+        chdir: "{{ app_dir }}"

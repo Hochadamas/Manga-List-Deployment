@@ -17,3 +17,4 @@ terraform/.terraform.lock.hcl
 *.pem
 *.tfvars
 ansible/inventory.ini
+*.retry
