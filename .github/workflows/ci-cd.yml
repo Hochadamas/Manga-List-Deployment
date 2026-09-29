@@ -45,6 +45,32 @@ jobs:
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     runs-on: ubuntu-latest
     steps:
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ap-northeast-1
+
+      - name: Get runner public IP
+        id: ip
+        run: echo "ip=$(curl -s https://checkip.amazonaws.com)" >> "$GITHUB_OUTPUT"
+
+      - name: Get security group ID
+        id: sg
+        run: |
+          SG_ID=$(aws ec2 describe-security-groups \
+            --filters "Name=group-name,Values=manga-list-sg" \
+            --query "SecurityGroups[0].GroupId" --output text)
+          echo "id=$SG_ID" >> "$GITHUB_OUTPUT"
+
+      - name: Allow SSH from runner IP
+        run: |
+          aws ec2 authorize-security-group-ingress \
+            --group-id ${{ steps.sg.outputs.id }} \
+            --protocol tcp --port 22 \
+            --cidr ${{ steps.ip.outputs.ip }}/32
+
       - name: Deploy via SSH
         uses: appleboy/ssh-action@v1.0.3
         with:
@@ -55,3 +81,11 @@ jobs:
             cd ~/Manga-List-Deployment
             git pull origin main
             docker compose up -d --build
+
+      - name: Revoke SSH access from runner IP
+        if: always()
+        run: |
+          aws ec2 revoke-security-group-ingress \
+            --group-id ${{ steps.sg.outputs.id }} \
+            --protocol tcp --port 22 \
+            --cidr ${{ steps.ip.outputs.ip }}/32
