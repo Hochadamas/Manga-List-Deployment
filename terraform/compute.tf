@@ -8,7 +8,7 @@ data "aws_ami" "amazon_linux" {
 }
 resource "aws_key_pair" "terraform_key" {
   key_name   = "manga-list-terraform-key"
-  public_key = file("~/.ssh/terraform-key.pub")
+  public_key = var.ssh_public_key
 }
 resource "aws_security_group" "manga_list_sg" {
   name   = "manga-list-sg"

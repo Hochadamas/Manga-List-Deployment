@@ -17,3 +17,8 @@ variable "instance_type" {
 variable "my_ip" {
   type = string
 }
+
+variable "ssh_public_key" {
+  description = "Contenu de la clé publique SSH pour l'EC2"
+  type        = string
+}
