@@ -19,10 +19,11 @@ This project builds on the DevOps toolchain explored in [Gitea-Infra-Deployment]
 
 ## Architecture
 
+```
 VPC (10.1.0.0/16)
 └── Public subnet (10.1.1.0/24)
-└── EC2: Flask app (Docker container, Gunicorn) + SQLite
-
+    └── EC2: Flask app (Docker container, Gunicorn) + SQLite
+```
 
 The instance is reachable via SSH only from a restricted IP, and via HTTP on port 80. Data (SQLite database, uploaded images) persists on the host through Docker bind mounts, surviving container rebuilds and restarts.
 
@@ -55,7 +56,12 @@ docker compose up -d --build
 
 ## Project status
 
-Application and Dockerization complete. Terraform infrastructure complete. Ansible deployment automation in progress.
+Application, Dockerization, Terraform infrastructure, Ansible automation, and GitHub Actions CI/CD are all complete.
+
+## Future improvements
+
+- Export the collection as CSV/JSON
+- Migrate from SQLite to PostgreSQL if the app needs to support multiple concurrent users
 
 ## License
 
